@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}List of
+	{{ category.name }}
+	programs.
+{% endblock %}
+
+{% block body %}
+	<div class="objectList">
+		{% for program in programs %}
+			<h1>List of
+				{{ category.name }}
+				programs.
+			</h1>
+			<div>
+				<h2>{{ loop.index }}
+					/
+					{{ program.title }}
+				</h2>
+				<p>{{ program.synopsis }}</p>
+				{# Link to program page #}
+				<a href="{{ path("program_show", { id: program.id }) }}">See program details</a>
+			</div>
+		{% else %}
+			No program found.
+		{% endfor %}
+	</div>
+
+	<a href="{{ path('program_index') }}">
+		Back to program index
+	</a>
+	<br>
+	<a href="{{ path('category_index') }}">
+		Back to category index
+	</a>
+{% endblock %}

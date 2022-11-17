@@ -13,7 +13,7 @@ class ProgramFixtures extends Fixture implements DependentFixtureInterface
     {
         $program = new Program();
         $program->setTitle('The Walking Dead');
-        $program->setSynopsis('Zombie apocalypse');
+        $program->setSynopsis('Zombie apocalypse, humans have to survive, together as well as against each other.');
         $program->setCategory($this->getReference('category_Action'));
         $manager->persist($program);
 
@@ -25,7 +25,7 @@ class ProgramFixtures extends Fixture implements DependentFixtureInterface
 
         $program = new Program();
         $program->setTitle('Better Call Saul');
-        $program->setSynopsis('Spin-off focusing on the lawyer character of Breaking Bad');
+        $program->setSynopsis('Spin-off focusing on the lawyer character of Breaking Bad.');
         $program->setCategory($this->getReference('category_Drama'));
         $manager->persist($program);
 

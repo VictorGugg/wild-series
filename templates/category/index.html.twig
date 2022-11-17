@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ website }}
+	- All categories
+{% endblock %}
+
+{% block body %}
+	<h1>{{ website }}
+		-
+		Index of all categories</h1>
+	{% for category in categories %}
+		<div>
+			<h2>{{ loop.index }}
+				/
+				{# Watch out : name the prefix of the table.field the same way you named it inside the Controller #}
+				<a href="{{ path("category_show", { categoryName: category.name }) }}">{{ category.name }}</a>
+			</div>
+		{% else %}
+			No category found.
+		{% endfor %}
+
+		<a href="{{ path('app_index') }}">
+			Home page
+		</a>
+	{% endblock %}
