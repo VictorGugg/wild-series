@@ -22,15 +22,21 @@
 			<h3>List of episodes</h3>
 			<ol>
 				{% for episode in episodes %}
-					<ul>Episode
-						{{ episode.number }}
-						-
-						{{ episode.title }}</ul>
+					<a href="{{ path("program_episode_show", { program: program.id, season: season.id, episode: episode.id }) }}">
+						<ul>Episode
+							{{ episode.number }}
+							-
+							{{ episode.title }}</ul>
+					</a>
 				{% endfor %}
 			</ol>
 		</div>
 	</div>
 
+	<a href="{{ path('program_show', { id: program.id }) }}">
+		Back to the list of seasons.
+	</a>
+	<br>
 	<a href="{{ path('program_index') }}">
 		Back to program index
 	</a>

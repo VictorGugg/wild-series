@@ -2,6 +2,9 @@
 // src/Controller/ProgramController.php
 namespace App\Controller;
 
+use App\Entity\Episode;
+use App\Entity\Program;
+use App\Entity\Season;
 use App\Repository\ProgramRepository;
 use App\Repository\SeasonRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -9,8 +12,21 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/program', name: 'program_')]
-class ProgramController extends AbstractController
+final class ProgramController extends AbstractController
 {
+    // TODO factorise function
+    // private function noProgramFound(): self
+    // {
+    //     if (!$program) {
+    //         throw $this->createNotFoundException(
+    //             'No program with id : {id} found in program\'s table.'
+    //         );
+    //         // Generate a 404
+    //     }
+
+    //     return $this;
+    // }
+
     #[Route('/', name: 'index')]
     public function index(ProgramRepository $programRepository): Response
     {
@@ -22,15 +38,16 @@ class ProgramController extends AbstractController
     }
 
     #[Route('/show/{id<^[0-9]+$>}', name: 'show')]
-    public function show(int $id, ProgramRepository $programRepository): Response
+    // public function show(int $id, ProgramRepository $programRepository): Response
+    public function show(Program $program): Response
     {
-        $program = $programRepository->findOneBy(['id' => $id]);
+        // $program = $programRepository->findOneBy(['id' => $id]);
         // same as $program = $programRepository->findOneBy($id);
         // same as $program = $programRepository->find($id);
 
         if (!$program) {
             throw $this->createNotFoundException(
-                'No program with id : ' . $id . ' found in program\'s table.'
+                'No program with id : {id} found in program\'s table.'
             );
             // Generate a 404
         }
@@ -38,28 +55,23 @@ class ProgramController extends AbstractController
 
 
         return $this->render('program/show.html.twig', [
-            'program' => $program,
-            'seasons' => $seasons,
+            'program'=>$program,
+            'seasons'=>$seasons,
         ]);
     }
 
-    #[Route('/{programId}/seasons/{seasonId}', name: 'season_show')]
-    public function showSeason(int $programId, int $seasonId,
-    ProgramRepository $programRepository,
-    SeasonRepository $seasonRepository): Response
+    #[Route('/{program}/season/{season}', name: 'season_show')]
+    public function showSeason(Program $program, Season $season): Response
     {
-        $program = $programRepository->findOneBy(['id' => $programId]);
-        $season = $seasonRepository->findOneBy(['id' => $seasonId]);
-
-        if (!$programId) {
+        if (!$program) {
             throw $this->createNotFoundException(
-                'No program with id : ' . $programId . ' found in program\'s table.'
+                'No program with id : {program} found in program\'s table.'
             );
             // Generate a 404
         }
-        if (!$seasonId) {
+        if (!$season) {
             throw $this->createNotFoundException(
-                'No season with id : ' . $seasonId . ' found in this program\'s table.'
+                'No season with id : {season} found in this program\'s table.'
             );
             // Generate a 404
         }
@@ -70,6 +82,34 @@ class ProgramController extends AbstractController
             'program' => $program,
             'season' => $season,
             'episodes' => $episodes,
+        ]);
+    }
+
+    #[Route('/{program}/season/{season}/episode/{episode}', name: 'episode_show')]
+    public function showEpisode(Program $program, Season $season, Episode $episode): Response
+    {
+        if (!$program) {
+            throw $this->createNotFoundException(
+                'No program with id : {program} found in programs\'s table.'
+            );
+            // Generate a 404
+        }
+        if (!$season) {
+            throw $this->createNotFoundException(
+                'No season with id : {season} found in this program table.'
+            );
+            // Generate a 404
+        }
+        if (!$episode) {
+            throw $this->createNotFoundException(
+                'No episode with id : {episode} found in this season table.'
+            );
+            // Generate a 404
+        }
+        return $this->render('program/episode_show.html.twig', [
+            'program' => $program,
+            'season' => $season,
+            'episode' => $episode,
         ]);
     }
 }
