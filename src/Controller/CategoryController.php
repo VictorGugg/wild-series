@@ -2,11 +2,15 @@
 
 namespace App\Controller;
 
+use App\Form\CategoryType;
+use App\Entity\Category;
 use App\Entity\Program;
 use App\Repository\CategoryRepository;
 use App\Repository\ProgramRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -21,6 +25,35 @@ final class CategoryController extends AbstractController
             'website' => 'Wild Series',
             'categories' => $categories,
         ]);
+    }
+
+    #[Route('/new', name: 'new')]
+    public function new(Request $request, CategoryRepository $categoryRepository): Response
+    {
+        $category = new Category();
+
+        // Create the form, linked with $category
+        $form = $this->createForm(CategoryType::class, $category);
+
+        // Get data from HTTP request
+        $form->handleRequest($request);
+        // Was the form submitted ?
+        if ($form->isSubmitted()) {
+            // Deal with the submitted data
+            $categoryRepository->save($category, true);
+            // And redirect to a route that display the result
+            return $this->redirectToRoute('category_index');
+        }
+
+        // Render the form (using the best practice)
+        return $this->renderForm('category/new.html.twig', [
+            'form' => $form,
+        ]);
+
+        // Alternative
+        // return $this->render('category/new.html.twig', [
+        //   'form' => $form->createView(),
+        // ]);
     }
 
     #[Route('/{categoryName}', methods: ['GET'], name: 'show')]

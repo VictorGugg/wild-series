@@ -5,11 +5,17 @@ namespace App\Controller;
 use App\Entity\Episode;
 use App\Entity\Program;
 use App\Entity\Season;
+use App\Form\ProgramType;
 use App\Repository\ProgramRepository;
 use App\Repository\SeasonRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+
 
 #[Route('/program', name: 'program_')]
 final class ProgramController extends AbstractController
@@ -37,7 +43,26 @@ final class ProgramController extends AbstractController
         ]);
     }
 
-    #[Route('/show/{id<^[0-9]+$>}', name: 'show')]
+    #[Route('/new', name: 'new')]
+    public function new(Request $request, ProgramRepository $programRepository): Response
+    {
+        $program = new Program();
+
+        $form = $this->createForm(ProgramType::class, $program);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted()) {
+            $programRepository->save($program, true);
+            return $this->redirectToRoute('program_index');
+        }
+
+        return $this->renderForm('program/new.html.twig', [
+            'form' => $form,
+        ]);
+    }
+
+    #[Route('/show/{program}', name: 'show')]
+    // #[ParamConverter('program', class: Program::class, options: ['mapping' => ['id' => 'program']])]
     // public function show(int $id, ProgramRepository $programRepository): Response
     public function show(Program $program): Response
     {
@@ -47,7 +72,7 @@ final class ProgramController extends AbstractController
 
         if (!$program) {
             throw $this->createNotFoundException(
-                'No program with id : {id} found in program\'s table.'
+                'No program with id : ' . $program . ' found in program\'s table.'
             );
             // Generate a 404
         }
@@ -65,13 +90,13 @@ final class ProgramController extends AbstractController
     {
         if (!$program) {
             throw $this->createNotFoundException(
-                'No program with id : {program} found in program\'s table.'
+                'No program with id : ' . $program . ' found in program\'s table.'
             );
             // Generate a 404
         }
         if (!$season) {
             throw $this->createNotFoundException(
-                'No season with id : {season} found in this program\'s table.'
+                'No season with id : ' . $season . ' found in this program\'s table.'
             );
             // Generate a 404
         }
@@ -90,19 +115,19 @@ final class ProgramController extends AbstractController
     {
         if (!$program) {
             throw $this->createNotFoundException(
-                'No program with id : {program} found in programs\'s table.'
+                'No program with id : ' . $program . ' found in program\'s table.'
             );
             // Generate a 404
         }
         if (!$season) {
             throw $this->createNotFoundException(
-                'No season with id : {season} found in this program table.'
+                'No season with id : ' . $season . ' found in this program\'s table.'
             );
             // Generate a 404
         }
         if (!$episode) {
             throw $this->createNotFoundException(
-                'No episode with id : {episode} found in this season table.'
+                'No episode with id : ' . $episode . ' found in this season table.'
             );
             // Generate a 404
         }
