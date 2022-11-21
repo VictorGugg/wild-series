@@ -7,8 +7,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProgramRepository::class)]
+#[UniqueEntity(
+    'title',
+    message: 'This title already exists.',
+    )]
 class Program
 {
     #[ORM\Id]
@@ -16,10 +22,26 @@ class Program
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(name: 'title', type: 'string', length: 255, unique: true)]
+    #[Assert\NotBlank(message: 'I shouldn\'t be empty.')]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: 'The input for program {{ value }} is too long, it should be of {{ limit }} characters max.',
+        )]
+    #[Assert\Regex(
+        pattern: "/plus belle la vie/mi",
+        match: false,
+        message: 'We\'re talking about real series here.',
+    )]
     private ?string $title = null;
 
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column(name: 'synopsis', type: Types::TEXT)]
+    #[Assert\NotBlank(message: 'I shouldn\'t be empty.')]
+    #[Assert\Regex(
+        pattern: "/plus belle la vie/mi",
+        match: false,
+        message: 'We\'re talking about real series here.',
+    )]
     private ?string $synopsis = null;
 
     #[ORM\Column(length: 255, nullable: true)]
