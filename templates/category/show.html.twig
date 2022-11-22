@@ -19,7 +19,7 @@
 				</h2>
 				<p>{{ program.synopsis }}</p>
 				{# Link to program page #}
-				<a href="{{ path("program_show", { id: program.id }) }}">See program details</a>
+				<a href="{{ path("program_show", { program: program.id }) }}">See program details</a>
 			</div>
 		{% else %}
 			No program found.

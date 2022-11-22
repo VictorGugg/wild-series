@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ website }}
+	- All actors
+{% endblock %}
+
+{% block body %}
+	<h1>{{ website }}
+		-
+																								Index of all actors</h1>
+	{% for actor in actors %}
+		<div>
+			<h2>
+				{{ loop.index }}
+				/
+				{{ actor.name }}
+			</h2>
+			{# Link to actor page #}
+			<a href="{{ path("actor_show", { id: actor.id }) }}">See actor details</a>
+		</div>
+	{% else %}
+		No actor found.
+	{% endfor %}
+
+	<a href="{{ path('category_index') }}">
+		Back to category index
+	</a>
+	<br>
+	<a href="{{ path('app_index') }}">
+		Home page
+	</a>
+{% endblock %}
