@@ -8,9 +8,13 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
 use Faker\Factory;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class ProgramFixtures extends Fixture implements DependentFixtureInterface
 {
+
+    private SluggerInterface $slugger;
+
     const PROGRAMS = [
         'The Walking Dead' => 'Action',
         'Breaking Bad' => 'Drama',
@@ -19,16 +23,29 @@ class ProgramFixtures extends Fixture implements DependentFixtureInterface
         'Sense8' => 'Sci-Fi',
     ];
 
+    public function __construct(SluggerInterface $slugger)
+    {
+        $this->slugger = $slugger;
+    }
+
     public function load(ObjectManager $manager)
     {
         $faker = Factory::create();
 
         foreach (self::PROGRAMS as $programName => $programCategory) {
             $program = new Program();
+
             $program->setTitle($programName);
+
+            $slug = $this->slugger->slug($programName);
+            $program->setSlug($slug);
+
             $program->setSynopsis($faker->paragraphs(1, true));
+
             $program->setCategory($this->getReference('category_' . $programCategory));
+
             $this->addReference('program_' . $programName, $program);
+            
             $manager->persist($program);
         }
 

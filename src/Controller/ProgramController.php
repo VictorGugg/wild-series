@@ -8,6 +8,7 @@ use App\Entity\Season;
 use App\Form\ProgramType;
 use App\Repository\ProgramRepository;
 use App\Repository\SeasonRepository;
+use App\Service\ProgramDuration;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
-
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/program', name: 'program_')]
 final class ProgramController extends AbstractController
@@ -44,7 +45,9 @@ final class ProgramController extends AbstractController
     }
 
     #[Route('/new', name: 'new')]
-    public function new(Request $request, ProgramRepository $programRepository): Response
+    public function new(Request $request,
+    ProgramRepository $programRepository,
+    SluggerInterface $slugger): Response
     {
         $program = new Program();
 
@@ -52,6 +55,8 @@ final class ProgramController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $slug = $slugger->slug($program->getTitle());
+            $program->setSlug($slug);
             $programRepository->save($program, true);
             return $this->redirectToRoute('program_index');
         }
@@ -61,10 +66,10 @@ final class ProgramController extends AbstractController
         ]);
     }
 
-    #[Route('/show/{program}', name: 'show')]
-    // #[ParamConverter('program', class: Program::class, options: ['mapping' => ['id' => 'program']])]
+    #[Route('/show/{program_slug}', name: 'show')]
+    #[Entity('program', class: Program::class, options: ['slug' => 'program_slug'])]
     // public function show(int $id, ProgramRepository $programRepository): Response
-    public function show(Program $program): Response
+    public function show(Program $program, ProgramDuration $programDuration): Response
     {
         // $program = $programRepository->findOneBy(['id' => $id]);
         // same as $program = $programRepository->findOneBy($id);
@@ -80,8 +85,9 @@ final class ProgramController extends AbstractController
 
 
         return $this->render('program/show.html.twig', [
-            'program'=>$program,
-            'seasons'=>$seasons,
+            'program' => $program,
+            'seasons' => $seasons,
+            'programDuration' => $programDuration->calculate($program),
         ]);
     }
 
